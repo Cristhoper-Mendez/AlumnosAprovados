@@ -6,12 +6,13 @@ namespace AlumnosAprovados
 {
     class Program
     {
-        static StreamReader Leer;
-        static StreamWriter Escritura;
 
-        static string aprovados = "aprovados.txt";
-        static string suficiencia = "suficiencia.txt";
-        static string desaprovados = "desaprovados.txt";
+        static string directorio = Directory.GetCurrentDirectory();
+        static string aprovados = directorio + "\\aprovados.txt";
+        static string suficiencia = directorio + "\\suficiencia.txt";
+        static string desaprovados = directorio + "\\desaprovados.txt";
+
+        static int opcionMenu;
 
         struct Alumno
         {
@@ -21,15 +22,11 @@ namespace AlumnosAprovados
         }
         static void Main(string[] args)
         {
-            Console.WriteLine("1 - Agregar 10 alumnos a archivos.");
-            Console.WriteLine("2 - Abrir archivo aprovados en Notepad.");
-            Console.WriteLine("3 - Imprimir aprobados, reprobados o suficiencia.");
-            Console.WriteLine("4 - Salir");
-            int opcion = int.Parse(Console.ReadLine());
+            MostrarMenu();
 
-            while (opcion > 0 &&opcion <4)
+            while (opcionMenu > 0 && opcionMenu < 4)
             {
-                switch (opcion)
+                switch (opcionMenu)
                 {
                     case 1:
                         AgregarAlumnos();
@@ -39,8 +36,9 @@ namespace AlumnosAprovados
                         AbrirAprovadosNotePad();
                         break;
 
-                    case 4:
+                    case 3:
                         ElegirOpcion();
+                        opcionMenu = 4;
                         break;
 
                     default:
@@ -53,22 +51,24 @@ namespace AlumnosAprovados
         {
             Console.Clear();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
+                Console.Clear();
+
                 Alumno alumno = new Alumno();
 
                 Console.WriteLine("Ingrese el nombre: ");
                 alumno.Nombre = Console.ReadLine();
 
                 Console.WriteLine("Ingrese el carnet: ");
-                alumno.Carnet= Console.ReadLine();
+                alumno.Carnet = Console.ReadLine();
 
-                Console.WriteLine("Ingrese el nombre: ");
+                Console.WriteLine("Ingrese el la nota global: ");
                 alumno.NotaGlobal = double.Parse(Console.ReadLine());
 
-                if(alumno.NotaGlobal >= 5.95 && alumno.NotaGlobal <= 10)
+                if (alumno.NotaGlobal >= 5.95 && alumno.NotaGlobal <= 10)
                 {
-                    Escritura = new StreamWriter(aprovados, true);
+                    StreamWriter Escritura = new StreamWriter("aprovados.txt", true);
 
                     if (i == 1)
                     {
@@ -77,51 +77,98 @@ namespace AlumnosAprovados
                     }
 
                     Escritura.WriteLine("-----------------------------------------");
-                    Escritura.WriteLine(alumno.Nombre);
-                    Escritura.WriteLine(alumno.Carnet);
-                    Escritura.WriteLine(alumno.NotaGlobal);
+                    Escritura.WriteLine("Nombre: " + alumno.Nombre);
+                    Escritura.WriteLine("Carnet: " + alumno.Carnet);
+                    Escritura.WriteLine("Nota global: " + alumno.NotaGlobal);
                     Escritura.WriteLine("-----------------------------------------");
-                } else if (alumno.NotaGlobal >5 && alumno.NotaGlobal < 5.95) {
+                    Escritura.Close();
+                }
+                else if (alumno.NotaGlobal > 5 && alumno.NotaGlobal < 5.95)
+                {
+                    StreamWriter Escritura = new StreamWriter("suficiencia.txt", true);
+
                     if (i == 1)
                     {
                         Escritura.WriteLine("ALUMNOS APTOS PARA PRUEBA DE SUFICIENCIA");
                         Escritura.WriteLine("  ");
                     }
 
-                    Escritura = new StreamWriter(suficiencia, true);
-
                     Escritura.WriteLine("-----------------------------------------");
-                    Escritura.WriteLine(alumno.Nombre);
-                    Escritura.WriteLine(alumno.Carnet);
-                    Escritura.WriteLine(alumno.NotaGlobal);
+                    Escritura.WriteLine("Nombre: " + alumno.Nombre);
+                    Escritura.WriteLine("Carnet: " + alumno.Carnet);
+                    Escritura.WriteLine("Nota global: " + alumno.NotaGlobal);
                     Escritura.WriteLine("-----------------------------------------");
-                } else
+                    Escritura.Close();
+                }
+                else
                 {
+                    StreamWriter Escritura = new StreamWriter("desaprovados.txt", true);
+
                     if (i == 1)
                     {
                         Escritura.WriteLine("ALUMNOS DESAPROVADOS");
                         Escritura.WriteLine("  ");
                     }
 
-                    Escritura = new StreamWriter(desaprovados, true);
-
                     Escritura.WriteLine("-----------------------------------------");
-                    Escritura.WriteLine(alumno.Nombre);
-                    Escritura.WriteLine(alumno.Carnet);
-                    Escritura.WriteLine(alumno.NotaGlobal);
+                    Escritura.WriteLine("Nombre: " + alumno.Nombre);
+                    Escritura.WriteLine("Carnet: " + alumno.Carnet);
+                    Escritura.WriteLine("Nota global: " + alumno.NotaGlobal);
                     Escritura.WriteLine("-----------------------------------------");
+                    Escritura.Close();
                 }
             }
+
+            MostrarMenu();
+        }
+
+        static void MostrarMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("1 - Agregar 10 alumnos a archivos.");
+            Console.WriteLine("2 - Abrir archivo aprovados en Notepad.");
+            Console.WriteLine("3 - Imprimir aprobados, reprobados o suficiencia.");
+            Console.WriteLine("4 - Salir");
+            opcionMenu = int.Parse(Console.ReadLine());
         }
 
         static void AbrirAprovadosNotePad()
         {
-            Process.Start(aprovados);
+            StartProcess(aprovados);
+            opcionMenu = 4;
         }
 
         static void ElegirOpcion()
         {
+            Console.Clear();
+            Console.WriteLine("Que archivo desea abrir?.");
+            Console.WriteLine("1 - Archivo aprovados.");
+            Console.WriteLine("2 - Archivo desaprovados.");
+            Console.WriteLine("3 - Archivo suficiencia");
+            int opcion = int.Parse(Console.ReadLine());
 
+            if (opcion == 1)
+            {
+                StartProcess(aprovados);
+                opcionMenu = 4;
+            }
+            else if (opcion == 2)
+            {
+                StartProcess(desaprovados);
+                opcionMenu = 4;
+            }
+            else
+            {
+                StartProcess(suficiencia);
+                opcionMenu = 4;
+            }
+
+
+        }
+
+        static void StartProcess(string archivo)
+        {
+            Process.Start("notepad.exe", archivo);
         }
     }
 }
